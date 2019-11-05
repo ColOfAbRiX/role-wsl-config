@@ -1,0 +1,43 @@
+---
+
+wsl_config_os_dependencies:
+ - apt-transport-https
+ - autoconf
+ - automake
+ - bind9utils
+ - build-essential
+ - ca-certificates
+ - colordiff
+ - curl
+ - dos2unix
+ - gettext
+ - git
+ - libffi-dev
+ - lsb-release
+ - patchutils
+ - python3
+ - python3-dev
+ - python3-pip
+ - python3-requests-kerberos
+ - python3-setuptools
+ - python3-winrm
+ - screen
+ - socat
+ - software-properties-common
+ - sshpass
+ - tree
+ - unzip
+ - unzip
+ - virtualenv
+ - wget
+ - zip
+
+wsl_config_pip_dependencies:
+ - ansible
+ - boto3
+ - colored
+ - configparser2
+ - GitPython
+ - mock
+ - pycrypto
+ - unittest2

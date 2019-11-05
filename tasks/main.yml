@@ -1,0 +1,76 @@
+---
+# tasks file for wsl-win-integration
+
+- name: "Require Correct Linux Distribution"
+  assert:
+    that: (ansible_distribution in ['CentOS', 'RedHat'] and ansible_distribution_version | version_compare('6.0.0', '>=')) or
+          (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('16.0.0', '>=')) and
+          'microsoft' in ansible_kernel | lower
+    msg:  "This Linux distribution '{{ ansible_distribution }} {{ ansible_distribution_version }}' is not supported by the role."
+  tags: wsl-config
+
+- name: "Check variables"
+  assert:
+    that:
+     - wsl_config_lnx_user != ''
+     - wsl_config_win_user != ''
+     - wsl_config_lnx_hostname != ''
+     - wsl_config_win_hostname != ''
+    msg: "Check that the required variables are not empty (see defaults/main.yml)"
+  tags: wsl-config
+
+- name: "Include OS Variables"
+  include_vars: "vars_{{ ansible_distribution }}.yml"
+  tags: wsl-config
+
+
+- name: "OS Dependencies"
+  package: name="{{ wsl_config_os_dependencies }}" state=present
+  tags: wsl-config
+
+- name: "Latest PIP version"
+  pip:
+    name: pip
+    executable: pip3
+    extra_args: --upgrade
+  tags: wsl-config
+
+- name: "PIP Dependencies"
+  pip: name="{{ wsl_config_pip_dependencies }}" state=present executable=pip3
+  tags: wsl-config
+
+
+- name: "Set templates"
+  template:
+    src:   "etc/{{ item }}.j2"
+    dest:  "/etc/{{ item }}"
+    owner: root
+    group: root
+    mode:  '0644'
+  with_items:
+   - wsl.conf
+   - hosts
+  tags: wsl-config
+
+# NEW_HOSTNAME=quantexa
+# DEFAULT_WSL_USER=fabriziocolonna
+# DEFAULT_WIN_USER=FabrizioColonna
+
+# # Using existing user home directory and mount metadata
+# # See: https://cepa.io/2018/02/10/linuxizing-your-windows-pc-part1/
+# hostname $NEW_HOSTNAME
+# echo "$NEW_HOSTNAME" > /etc/hostname
+
+# # Fixing file permission issues
+# # See: https://www.turek.dev/post/fix-wsl-file-permissions/
+# sed -re "s|/home/$DEFAULT_WSL_USER|/mnt/c/Users/$DEFAULT_WIN_USER|" -i /etc/passwd
+
+# # Note: Bash on Windows does not currently apply umask properly.
+# echo -e "\n# Fix windows permissions\n[[ \"\$(umask)\" = \"0000\" ]] && umask 0022\n" >> ~/.bashrc
+
+# # ccat
+# curl -s https://api.github.com/repos/jingweno/ccat/releases/latest |
+#     grep "browser_download_url.*linux-amd64.*\.tar\.gz" |
+#     cut -d : -f 2,3 |
+#     tr -d \" |
+#     wget -qi -

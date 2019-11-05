@@ -1,0 +1,18 @@
+{% macro write_option(section, name) -%}
+{% set var_name = "wsl_config_etc_" + section + "_" + name %}
+{%- if vars[var_name] | default('') != '' %}{{ name }} = {{ vars[var_name] }}{% endif -%}
+{%- endmacro %}
+# /etc/wsl.config
+# {{ ansible_managed}}
+# See:
+#   https://docs.microsoft.com/en-us/windows/wsl/wsl-config#set-wsl-launch-settings
+
+[automount]
+{{ write_option("automount", "enabled") }}
+{{ write_option("automount", "options") }}
+{{ write_option("automount", "root") }}
+{{ write_option("automount", "mountFsTab") }}
+
+[network]
+{{ write_option("network", "generateHosts") }}
+{{ write_option("network", "generateResolvConf") }}

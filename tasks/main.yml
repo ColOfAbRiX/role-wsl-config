@@ -9,16 +9,6 @@
     msg:  "This Linux distribution '{{ ansible_distribution }} {{ ansible_distribution_version }}' is not supported by the role."
   tags: wsl-config
 
-- name: "Check variables"
-  assert:
-    that:
-     - wsl_config_lnx_user != ''
-     - wsl_config_win_user != ''
-     - wsl_config_lnx_hostname != ''
-     - wsl_config_win_hostname != ''
-    msg: "Check that the required variables are not empty (see defaults/main.yml)"
-  tags: wsl-config
-
 - name: "Include OS Variables"
   include_vars: "vars_{{ ansible_distribution }}.yml"
   tags: wsl-config
@@ -40,6 +30,11 @@
   tags: wsl-config
 
 
+- name: "Set Hostname"
+  hostname: name="{{ wsl_config_wsl_hostname }}"
+  when: wsl_config_wsl_hostname | default('') != ''
+  tags: wsl-config
+
 - name: "Set templates"
   template:
     src:   "etc/{{ item }}.j2"
@@ -52,25 +47,9 @@
    - hosts
   tags: wsl-config
 
-# NEW_HOSTNAME=quantexa
-# DEFAULT_WSL_USER=fabriziocolonna
-# DEFAULT_WIN_USER=FabrizioColonna
-
-# # Using existing user home directory and mount metadata
-# # See: https://cepa.io/2018/02/10/linuxizing-your-windows-pc-part1/
-# hostname $NEW_HOSTNAME
-# echo "$NEW_HOSTNAME" > /etc/hostname
-
-# # Fixing file permission issues
-# # See: https://www.turek.dev/post/fix-wsl-file-permissions/
-# sed -re "s|/home/$DEFAULT_WSL_USER|/mnt/c/Users/$DEFAULT_WIN_USER|" -i /etc/passwd
-
-# # Note: Bash on Windows does not currently apply umask properly.
-# echo -e "\n# Fix windows permissions\n[[ \"\$(umask)\" = \"0000\" ]] && umask 0022\n" >> ~/.bashrc
-
-# # ccat
-# curl -s https://api.github.com/repos/jingweno/ccat/releases/latest |
-#     grep "browser_download_url.*linux-amd64.*\.tar\.gz" |
-#     cut -d : -f 2,3 |
-#     tr -d \" |
-#     wget -qi -
+- name: "Update main user home directory"
+  user:
+    name: "{{ item.username }}"
+    home: "{{ wsl_config_win_home_root }}/{{ item.win_username }}"
+  with_items: "{{ wsl_config_users }}"
+  tags: wsl-config

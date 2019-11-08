@@ -1,18 +1,15 @@
 ---
 # defaults file for wsl-win-integration
 
-wsl_config_lnx_user: ''
-wsl_config_win_user: ''
-wsl_config_lnx_hostname: ''
-wsl_config_win_hostname: ''
-wsl_config_win_home: "/mnt/c/Users/{{ wsl_config_win_user }}"
+wsl_config_wsl_hostname:  ''
+wsl_config_win_home_root: "/mnt/c/Users"
 
 # /etc/wsl.conf
-wsl_config_etc_automount_enabled:          "true"
-wsl_config_etc_automount_options:          "metadata,umask=22,fmask=11"
-wsl_config_etc_automount_root:             ''
-wsl_config_etc_automount_mountFsTab:       ''
-wsl_config_etc_network_generateHosts:      "false"
+wsl_config_etc_automount_enabled:     "true"
+wsl_config_etc_automount_options:     "metadata,umask=22,fmask=11"
+wsl_config_etc_automount_root:        ''
+wsl_config_etc_automount_mountFsTab:  ''
+wsl_config_etc_network_generateHosts: "false"
 wsl_config_etc_network_generateResolvConf: "true"
 
 # /etc/hosts
@@ -20,3 +17,9 @@ wsl_config_hosts: []
 #  - addr: 192.168.0.1
 #    fqdn: test.example.com
 #    short: test
+
+wsl_config_users: []
+#  - username: linuxusername
+#    win_username: WindowsUsername
+#    # Optionals
+#    win_home_path: /mnt/c/Users/WindowsUsername

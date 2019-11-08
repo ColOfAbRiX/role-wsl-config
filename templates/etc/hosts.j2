@@ -10,9 +10,9 @@ ff02::2          ip6-allrouters
 
 # Localhost
 127.0.0.1        localhost
-127.0.0.1        {{ wsl_config_win_hostname }}
-127.0.1.1        {{ wsl_config_win_hostname }}.localdomain  {{ wsl_config_win_hostname }}
-127.0.1.1        {{ wsl_config_win_hostname }}.mshome.net   {{ wsl_config_win_hostname }}
+127.0.0.1        {{ wsl_config_wsl_hostname }}
+127.0.1.1        {{ wsl_config_wsl_hostname }}.localdomain  {{ wsl_config_wsl_hostname }}
+127.0.1.1        {{ wsl_config_wsl_hostname }}.mshome.net   {{ wsl_config_wsl_hostname }}
 
 # Additional hosts
 {% for host_entry in wsl_config_hosts | default([]) %}

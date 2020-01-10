@@ -47,9 +47,10 @@
    - hosts
   tags: wsl-config
 
-- name: "Update main user home directory"
-  user:
-    name: "{{ item.username }}"
-    home: "{{ wsl_config_win_home_root }}/{{ item.win_username }}"
+- name: "Update users home directory"
+  replace:
+    path:    /etc/passwd
+    regexp:  "^({{ item.username }}:[^:]*:[^:]*:[^:]*:[^:]*:)([^:]*)(:[^:]*)$"
+    replace: "\\1{{ wsl_config_win_home_root }}/{{ item.win_username }}\\3"
   with_items: "{{ wsl_config_users }}"
   tags: wsl-config

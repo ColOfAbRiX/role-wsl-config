@@ -26,6 +26,7 @@ wsl_config_os_dependencies:
  - software-properties-common
  - sshpass
  - tree
+ - tmux
  - unzip
  - unzip
  - virtualenv

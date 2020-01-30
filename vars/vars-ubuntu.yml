@@ -4,6 +4,7 @@ wsl_config_os_dependencies:
  - apt-transport-https
  - autoconf
  - automake
+ - bash-completion
  - bind9utils
  - build-essential
  - ca-certificates
@@ -14,6 +15,7 @@ wsl_config_os_dependencies:
  - git
  - libffi-dev
  - lsb-release
+ - manpages
  - patchutils
  - python3
  - python3-dev
@@ -25,8 +27,8 @@ wsl_config_os_dependencies:
  - socat
  - software-properties-common
  - sshpass
- - tree
  - tmux
+ - tree
  - unzip
  - unzip
  - virtualenv
@@ -34,8 +36,6 @@ wsl_config_os_dependencies:
  - zip
 
 wsl_config_pip_dependencies:
- - ansible
- - boto3
  - colored
  - configparser2
  - GitPython

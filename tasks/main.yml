@@ -3,14 +3,15 @@
 
 - name: "Require Correct Linux Distribution"
   assert:
-    that: (ansible_distribution in ['CentOS', 'RedHat'] and ansible_distribution_version | version_compare('6.0.0', '>=')) or
-          (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('16.0.0', '>=')) and
+    that: (ansible_distribution in ['CentOS', 'RedHat'] and ansible_distribution_version | version_compare('7.0.0', '>=')) or
+          (ansible_distribution == 'Ubuntu' and ansible_distribution_version | version_compare('18.0.0', '>=')) or
+          (ansible_distribution == 'Debian' and ansible_distribution_version | version_compare('7.0.0', '>=')) and
           'microsoft' in ansible_kernel | lower
     msg:  "This Linux distribution '{{ ansible_distribution }} {{ ansible_distribution_version }}' is not supported by the role."
   tags: wsl-config
 
 - name: "Include OS Variables"
-  include_vars: "vars_{{ ansible_distribution }}.yml"
+  include_vars: "vars-{{ ansible_distribution | lower }}.yml"
   tags: wsl-config
 
 
@@ -18,12 +19,12 @@
   package: name="{{ wsl_config_os_dependencies }}" state=present
   tags: wsl-config
 
-- name: "Latest PIP version"
-  pip:
-    name: pip
-    executable: pip3
-    extra_args: --upgrade
-  tags: wsl-config
+# - name: "Latest PIP version"
+#   pip:
+#     name: pip
+#     executable: pip3
+#     extra_args: --upgrade
+#   tags: wsl-config
 
 - name: "PIP Dependencies"
   pip: name="{{ wsl_config_pip_dependencies }}" state=present executable=pip3

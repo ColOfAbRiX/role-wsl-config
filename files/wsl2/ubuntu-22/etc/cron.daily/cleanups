@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Clean temporary files older than few days
+find /tmp /var/tmp -mtime +7 -exec rm -rf {} \;

@@ -1,0 +1,48 @@
+---
+- name: "Install OS Dependencies"
+  ansible.builtin.apt:
+    name: "{{ wsl_config_os_dependencies }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 604800 # 1 week
+  tags: [wsl-win-integration, dependencies]
+
+- name: "Set system configuration"
+  ansible.builtin.template:
+    src: "{{ templates_root }}/etc/{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - resolv.conf
+    - hosts
+  tags: wsl-win-integration
+
+- name: "Disable Unwanted Services"
+  ansible.builtin.shell: "update-rc.d {{ item }} remove"
+  loop: "{{ wsl_config_nostart_services }}"
+  changed_when: false
+  tags: wsl-win-integration
+
+- name: "Fix WSL2 Windows Interop (binfmt_misc)"
+  become: yes
+  block:
+
+    - name: "Create binfmt.d configuration for WSL Interop"
+      ansible.builtin.copy:
+        dest: /etc/binfmt.d/wsl-interop.conf
+        content: ":WSLInterop:M::MZ::/init:PF\n"
+        mode: "0644"
+
+    - name: "Manual Interop registration"
+      ansible.builtin.shell: |
+        if [ ! -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
+          echo ':WSLInterop:M::MZ::/init:PF' > /proc/sys/fs/binfmt_misc/register
+        fi
+      args:
+        executable: /bin/bash
+      register: registration_output
+      changed_when: "registration_output.stdout != ''"
+
+  tags: wsl-win-integration

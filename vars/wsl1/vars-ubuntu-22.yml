@@ -10,7 +10,6 @@ wsl_config_os_dependencies:
  - ca-certificates
  - colordiff
  - curl
- - dnsutils
  - dos2unix
  - gettext
  - git
@@ -23,7 +22,6 @@ wsl_config_os_dependencies:
  - python3-pip
  - python3-requests-kerberos
  - python3-setuptools
- - python3-winrm
  - screen
  - socat
  - software-properties-common
@@ -31,8 +29,6 @@ wsl_config_os_dependencies:
  - tmux
  - tree
  - unzip
- - unzip
- - vim
  - virtualenv
  - wget
  - zip
@@ -44,3 +40,18 @@ wsl_config_pip_dependencies:
  - mock
  - pycrypto
  - unittest2
+
+wsl_config_nostart_services:
+ - acpid
+ - apport
+ - avahi-daemon
+ - console-setup.sh
+ - irqbalance
+ - lvm2-lvmetad
+ - lvm2-lvmpolld
+ - lxcfs
+ - lxd
+ - mdadm
+ - open-vm-tools
+ - plymouth
+ - unattended-upgrades

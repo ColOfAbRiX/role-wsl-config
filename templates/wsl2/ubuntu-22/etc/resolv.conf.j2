@@ -1,0 +1,7 @@
+# /etc/resolv.conf
+
+{% for line in wsl_config_wsl_resolveConf | default({}) %}
+{% for key in line.keys() %}
+{{ key }} {{ line[key] }}
+{% endfor %}
+{% endfor %}

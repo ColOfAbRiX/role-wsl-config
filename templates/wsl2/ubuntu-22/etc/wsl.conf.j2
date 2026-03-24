@@ -1,0 +1,14 @@
+# /etc/wsl.conf
+
+{% set wsl_conf = wsl_config_wsl_conf | default({}) | combine(default_wsl_config_wsl_conf, recursive=True) %}
+{% for section, options in wsl_conf.items() %}
+{% if options | length > 0 %}
+[{{ section }}]
+{% for key, value in options.items() %}
+{% if value | length > 0 %}
+{{ key }} = {{ value }}
+{% endif %}
+{% endfor %}
+
+{% endif %}
+{% endfor %}

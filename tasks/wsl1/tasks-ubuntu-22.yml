@@ -1,0 +1,71 @@
+---
+- name: "OS Dependencies"
+  block:
+
+    - name: "Install OS Dependencies"
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ wsl_config_os_dependencies }}"
+      register: package_install_result
+      failed_when: false
+      when: wsl_config_os_dependencies is defined and wsl_config_os_dependencies | length > 0
+
+    - name: "PIP Dependencies"
+      ansible.builtin.pip:
+        name: "{{ wsl_config_pip_dependencies }}"
+        state: present
+        executable: pip3
+      tags: wsl-win-integration
+
+  tags: wsl-win-integration
+
+- name: "Set system configuration"
+  ansible.builtin.template:
+    src: "{{ templates_root }}/etc/{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - resolv.conf
+    - hosts
+  tags: wsl-win-integration
+
+- name: "Disable Unwanted Services"
+  ansible.builtin.shell: "update-rc.d {{ item }} remove"
+  loop: "{{ wsl_config_nostart_services }}"
+  changed_when: false
+
+# # #  WSL-Windows Services Startup  # #
+
+- name: "WSL-Windows Services"
+  block:
+
+   - name: "Linux-side Scripts"
+     ansible.builtin.copy:
+       src:   "{{ templates_root }}/tc/wsl-services-init"
+       dest:  /etc/wsl-services-init
+       owner: root
+       group: root
+       mode:  '0755'
+
+   - name: "Sudo Permissions"
+     ansible.builtin.lineinfile:
+       path:   /etc/sudoers
+       regexp: '/etc/wsl-services-init$'
+       line:   '%sudo ALL=(ALL:ALL)NOPASSWD: /etc/wsl-services-init'
+
+   - name: "Services Startup"
+     ansible.builtin.template:
+       src:   "{{ templates_root }}/etc/{{ item }}.j2"
+       dest:  "/etc/{{ item }}"
+       owner: root
+       group: root
+       mode:  '0644'
+     loop:
+      - wsl.conf
+      - hosts
+
+  when: wsl_config_integrate_services | default(true) | bool
+  tags: wsl-win-integration

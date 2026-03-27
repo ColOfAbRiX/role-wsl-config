@@ -13,10 +13,11 @@
     dest: "/etc/{{ item }}"
     owner: root
     group: root
-    mode: "0644"
+    mode: "{% if item.endswith('.sh') %}0755{% else %}0644{% endif %}"
   with_items:
     - resolv.conf
     - hosts
+    - profile.d/wsl-runtime.sh
   tags: wsl-win-integration
 
 - name: "Disable Unwanted Services"
@@ -25,8 +26,8 @@
   changed_when: false
   tags: wsl-win-integration
 
-- name: "Fix WSL2 Windows Interop (binfmt_misc)"
-  become: yes
+- name: "Fix WSL2 Windows Interop"
+  become: true
   block:
 
     - name: "Create binfmt.d configuration for WSL Interop"

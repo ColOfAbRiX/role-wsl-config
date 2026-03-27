@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Get username for cache directory
+CURRENT_USER=$(whoami)
+
+# Set default XDG_RUNTIME_DIR if empty or pointing to restricted path
+if [ -z "$XDG_RUNTIME_DIR" ] || [[ "$XDG_RUNTIME_DIR" == "/run/user/"* ]]; then
+    export XDG_RUNTIME_DIR="/var/cache/${CURRENT_USER}/runtime"
+fi
+
+# Create runtime directory if it doesn't exist
+if [ -n "$XDG_RUNTIME_DIR" ] && [ ! -d "$XDG_RUNTIME_DIR" ]; then
+    mkdir -p "$XDG_RUNTIME_DIR"
+    chmod 700 "$XDG_RUNTIME_DIR"
+fi

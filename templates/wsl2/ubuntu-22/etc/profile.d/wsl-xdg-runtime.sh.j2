@@ -1,0 +1,8 @@
+#!/bin/sh
+
+{% for user in wsl_config_users %}
+if [ "$USER" = "{{ user.username }}" ]; then
+    export XDG_RUNTIME_DIR="/run/user/{{ getent_passwd[user.username][1] }}"
+    export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+fi
+{% endfor %}

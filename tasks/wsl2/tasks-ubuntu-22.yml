@@ -17,7 +17,6 @@
   with_items:
     - resolv.conf
     - hosts
-    - profile.d/wsl-runtime.sh
   tags: wsl-win-integration
 
 - name: "Disable Unwanted Services"
@@ -30,20 +29,62 @@
   become: true
   block:
 
-    - name: "Create binfmt.d configuration for WSL Interop"
+    - name: "Mask the WSL-provided systemd skip-condition"
+      ansible.builtin.file:
+        path: "/etc/systemd/system/systemd-binfmt.service.d/{{ item }}"
+        state: touch
+        mode: "0644"
+      loop:
+        - wsl.conf
+        - override.conf
+
+    - name: "Deploy binfmt.d configuration with PF flags"
       ansible.builtin.copy:
         dest: /etc/binfmt.d/wsl-interop.conf
         content: ":WSLInterop:M::MZ::/init:PF\n"
         mode: "0644"
 
-    - name: "Manual Interop registration"
+    - name: "Force-apply the correct Interop registration"
       ansible.builtin.shell: |
-        if [ ! -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
-          echo ':WSLInterop:M::MZ::/init:PF' > /proc/sys/fs/binfmt_misc/register
-        fi
-      args:
-        executable: /bin/bash
-      register: registration_output
-      changed_when: "registration_output.stdout != ''"
+        systemctl daemon-reload
+        echo -1 > /proc/sys/fs/binfmt_misc/WSLInterop || true
+        /lib/systemd/systemd-binfmt
+      register: binfmt_force
+      changed_when: binfmt_force.rc == 0
+
+    - name: "Ensure systemd-binfmt service is truly active"
+      ansible.builtin.systemd:
+        name: systemd-binfmt
+        state: restarted
+        enabled: yes
+
+  tags: wsl-win-integration
+
+- name: "Fix WSL2 Systemd User Session"
+  become: true
+  block:
+    - name: "Get UID for WSL users"
+      ansible.builtin.getent:
+        database: passwd
+
+    - name: "Enable User Lingering to prevent runtime-dir timeout"
+      ansible.builtin.command:
+        cmd: "loginctl enable-linger {{ item.username }}"
+        creates: "/var/lib/systemd/linger/{{ item.username }}"
+      loop: "{{ wsl_config_users }}"
+
+    - name: "Set XDG_RUNTIME_DIR and DBUS via template"
+      ansible.builtin.template:
+        src: "{{ templates_root }}/etc/profile.d/wsl-xdg-runtime.sh.j2"
+        dest: /etc/profile.d/wsl-xdg-runtime.sh
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: "Ensure user runtime services are enabled"
+      ansible.builtin.systemd:
+        name: "user-runtime-dir@{{ getent_passwd[item.username][1] }}.service"
+        enabled: yes
+      loop: "{{ wsl_config_users }}"
 
   tags: wsl-win-integration

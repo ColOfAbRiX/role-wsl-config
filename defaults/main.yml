@@ -7,10 +7,6 @@ wsl_config_integrate_services: true
 
 wsl_config_users: []
 #  - username: linuxusername
-#
-# Optionalswin_username: WindowsUsername
-#
-#    win_home_path: /mnt/c/Users/WindowsUsername
 
 # /etc/wsl.conf - See https://learn.microsoft.com/en-us/windows/wsl/wsl-config#set-wsl-launch-settings
 wsl_config_wsl_conf: {}
@@ -19,18 +15,18 @@ default_wsl_config_wsl_conf:
   automount:
     # Enable automounting of Windows drives (true/false)
     enabled: "true"
-    # # Also mount drives listed in /etc/fstab (true/false) - NOTE: default is true per docs
+    # Also mount drives listed in /etc/fstab (true/false) - NOTE: default is true per docs
     # mountFsTab: "true"
-    # # Mount point under which Windows drives will be available
+    # Mount point under which Windows drives will be available
     # root: "/mnt/"
     # Comma-separated list of DrvFs-specific options (uid, gid, umask, fmask, dmask, metadata, case)
     options: "metadata,umask=22,fmask=11"
 
   # Network Settings - Control DNS and hosts file generation
   network:
-    # # Automatically generate /etc/hosts (true/false)
+    # Automatically generate /etc/hosts (true/false)
     # generateHosts: "true"
-    # # Automatically generate /etc/resolv.conf (true/false)
+    # Automatically generate /etc/resolv.conf (true/false)
     # generateResolvConf: "true"
     # Sets hostname to be used for WSL distribution (string)
     hostname: "{{ wsl_config_wsl_hostname | default('') }}"
@@ -49,19 +45,19 @@ default_wsl_config_wsl_conf:
 
   # Boot Settings - Commands and services to run at boot
   boot:
-    # # Command to run when WSL instance boots (string)
+    # Command to run when WSL instance boots (string)
     # command: ""
     # Enable systemd support (true/false) - Note: requires WSL 0.67.6+
     systemd: "{{ default_wsl_config_wsl_conf_boot_systemd }}"
-    # # Prevent WSL from generating systemd units when systemd is enabled (bool, Win11+)
-    # protectBinfmt: "false"
+    # Prevent WSL from generating systemd units when systemd is enabled (bool, Win11+)
+    protectBinfmt: "false"
 
   # GPU Settings - GPU access (WSL2 only)
   # gpu:
   #   # Enable GPU access from WSL (true/false)
   #   enabled: "true"
 
-  # # Time Settings - Time synchronization
+  # Time Settings - Time synchronization
   # time:
   #   # Use and sync to Windows timezone (true/false)
   #   useWindowsTimezone: "true"

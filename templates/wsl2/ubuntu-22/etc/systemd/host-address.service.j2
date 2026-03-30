@@ -1,0 +1,19 @@
+[Unit]
+Description=Host Address Advertiser Socket
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/python3 \
+    {{ wsl_config_host_address_path }}/host-address.py \
+        --no-daemon \
+        --verbose \
+        --socket {{ wsl_config_host_address_file }} \
+        --pidfile {{ wsl_config_host_address_pid }}
+
+[Install]
+WantedBy=multi-user.target

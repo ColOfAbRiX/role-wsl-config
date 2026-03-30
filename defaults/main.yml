@@ -70,3 +70,8 @@ wsl_config_hosts: []
 
 # /etc/resolve.conf
 wsl_config_wsl_resolveConf: []
+
+# Host IP address advertising service
+wsl_config_host_address_path: "/usr/local/bin"
+wsl_config_host_address_file: "/run/host-address.fifo"
+wsl_config_host_address_pid: "/var/run/host-address.pid"

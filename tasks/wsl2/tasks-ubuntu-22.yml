@@ -5,7 +5,7 @@
     state: present
     update_cache: yes
     cache_valid_time: 604800 # 1 week
-  tags: [wsl-win-integration, dependencies]
+  tags: wsl-win-integration
 
 - name: "Set system configuration"
   ansible.builtin.template:
@@ -87,4 +87,37 @@
         enabled: yes
       loop: "{{ wsl_config_users }}"
 
+  tags: wsl-win-integration
+
+- name: "Copy host-address.py to the target machine"
+  ansible.builtin.copy:
+    src: "{{ files_root }}/host-address.py"
+    dest: "{{ wsl_config_host_address_path }}/host-address.py"
+    mode: '0755'
+    owner: root
+    group: root
+  tags: wsl-win-integration
+
+- name: "Create the systemd service file from template"
+  ansible.builtin.template:
+    src: "{{ templates_root }}/etc/systemd/host-address.service.j2"
+    dest: /etc/systemd/system/host-address.service
+    mode: '0644'
+    owner: root
+    group: root
+  register: wsl_keeagent_unit
+  tags: wsl-win-integration
+
+- name: "Ensure host-address service is enabled and started"
+  ansible.builtin.systemd:
+    name: host-address
+    state: started
+    enabled: true
+  tags: wsl-win-integration
+
+- name: "Reload systemd daemon"
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: wsl_keeagent_unit.changed
   tags: wsl-win-integration

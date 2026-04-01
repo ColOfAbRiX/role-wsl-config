@@ -1,0 +1,42 @@
+---
+
+- name: "Mask the WSL-provided systemd skip-condition"
+  become: true
+  ansible.builtin.file:
+    path: "/etc/systemd/system/systemd-binfmt.service.d/{{ item }}"
+    state: touch
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - wsl.conf
+    - override.conf
+  tags: wsl-win-integration
+
+- name: "Deploy binfmt.d configuration with PF flags"
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/binfmt.d/wsl-interop.conf
+    content: ":WSLInterop:M::MZ::/init:PF\n"
+    owner: root
+    group: root
+    mode: "0644"
+  tags: wsl-win-integration
+
+- name: "Force-apply the correct Interop registration"
+  become: true
+  ansible.builtin.shell: |
+    systemctl daemon-reload
+    echo -1 > /proc/sys/fs/binfmt_misc/WSLInterop || true
+    /lib/systemd/systemd-binfmt
+  register: binfmt_force
+  changed_when: binfmt_force.rc == 0
+  tags: wsl-win-integration
+
+- name: "Ensure systemd-binfmt service is truly active"
+  become: true
+  ansible.builtin.systemd:
+    name: systemd-binfmt
+    state: restarted
+    enabled: yes
+  tags: wsl-win-integration

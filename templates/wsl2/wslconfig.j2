@@ -1,0 +1,10 @@
+# .wslconfig
+# See: https://learn.microsoft.com/en-us/windows/wsl/wsl-config
+
+{% for section, options in wsl_config_winconfig.items() %}
+[{{ section }}]
+{% for key, value in options.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+
+{% endfor %}

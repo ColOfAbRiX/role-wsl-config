@@ -1,7 +1,6 @@
 ---
 
 wsl_config_os_dependencies:
- - apt-transport-https
  - autoconf
  - automake
  - bash-completion
@@ -11,12 +10,8 @@ wsl_config_os_dependencies:
  - colordiff
  - curl
  - dos2unix
- - gettext
  - git
- - libffi-dev
- - lsb-release
  - manpages
- - patchutils
  - python3
  - python3-colored
  - python3-dev
@@ -26,12 +21,10 @@ wsl_config_os_dependencies:
  - python3-pycryptodome # Tentative replecement for pip pycrypto
  - python3-requests-kerberos
  - python3-setuptools
+ - python3-tomli
  - python3-unittest2
  - python3-venv
- - screen
  - socat
- - software-properties-common
- - sshpass
  - tmux
  - tree
  - unzip
@@ -39,17 +32,8 @@ wsl_config_os_dependencies:
  - zip
 
 wsl_config_nostart_services:
- - acpid
  - apport
- - avahi-daemon
- - console-setup.sh
  - irqbalance
- - lvm2-lvmetad
- - lvm2-lvmpolld
- - lxcfs
- - lxd
- - mdadm
- - open-vm-tools
  - plymouth
  - unattended-upgrades
 

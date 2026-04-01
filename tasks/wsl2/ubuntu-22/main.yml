@@ -1,0 +1,46 @@
+---
+
+- name: "Install OS Dependencies"
+  ansible.builtin.apt:
+    name: "{{ wsl_config_os_dependencies }}"
+    state: present
+  tags: wsl-win-integration
+
+- name: "Fix WSL2 Windows Binary Interop"
+  ansible.builtin.include_tasks: bin-interop.yml
+  tags: wsl-win-integration
+
+- name: "Fix WSL2 Systemd User Session"
+  ansible.builtin.include_tasks: systemd-user-session.yml
+  tags: wsl-win-integration
+
+- name: "Fix WSL2 Windows Networking"
+  ansible.builtin.include_tasks: network-fixes.yml
+  when: wsl_config_networkfix_enabled | default(true)
+  tags: wsl-win-integration
+
+- name: "Host IP Address Advertiser"
+  ansible.builtin.include_tasks: host-ip-advertiser.yml
+  tags: wsl-win-integration
+- name: "Set system configuration"
+  ansible.builtin.template:
+    src: "{{ templates_root }}/etc/{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - resolv.conf
+    - hosts
+  when: not (wsl_config_networkfix_enabled | default(true))
+  tags: wsl-win-integration
+
+- name: "Disable Unwanted Services"
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+    masked: false
+  loop: "{{ wsl_config_nostart_services }}"
+  tags: wsl-win-integration

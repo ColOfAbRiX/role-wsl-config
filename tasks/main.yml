@@ -20,7 +20,7 @@
   tags: always
 
 - name: "Run OS/WSL Tasks"
-  ansible.builtin.include_tasks: "{{ wsl_version }}/tasks-{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+  ansible.builtin.include_tasks: "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}/main.yml"
   tags: wsl-win-integration
 
 - name: "Set wsl.conf"

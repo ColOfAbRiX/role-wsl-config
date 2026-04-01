@@ -1,0 +1,88 @@
+---
+
+# Network fix. See: https://github.com/microsoft/WSL/issues/5420#issuecomment-646479747
+
+- name: "Disable systemd-resolved"
+  become: true
+  block:
+
+    - name: "Check if systemd-resolved is present"
+      ansible.builtin.command: systemctl list-unit-files systemd-resolved.service
+      register: resolved_check
+      changed_when: false
+      failed_when: false
+
+    - name: "Stop and disable systemd-resolved"
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+        masked: true
+      when: resolved_check.rc == 0 and
+            'systemd-resolved.service' in resolved_check.stdout
+
+  tags: wsl-win-integration
+
+- name: "Configure /etc/resolv.conf"
+  become: true
+  block:
+
+    - name: "Enforce resolve.conf configuration"
+      ansible.builtin.set_fact:
+        default_wsl_config_wsl_conf: "{{ default_wsl_config_wsl_conf | combine(wsl_config_networkfix_resolv_conf) }}"
+
+    - name: "Remove immutable flag from /etc/resolv.conf"
+      ansible.builtin.command: chattr -i /etc/resolv.conf
+      changed_when: false
+      failed_when: false
+
+    - name: "Check if /etc/resolv.conf is a symlink"
+      ansible.builtin.stat:
+        path: /etc/resolv.conf
+      register: resolv_stat
+
+    - name: "Remove /etc/resolv.conf symlink"
+      ansible.builtin.file:
+        path: /etc/resolv.conf
+        state: absent
+      when: resolv_stat.stat.islnk | default(false)
+
+    - name: "Deploy /etc/resolv.conf from template"
+      ansible.builtin.template:
+        src: "{{ templates_root }}/etc/resolv.conf.j2"
+        dest: /etc/resolv.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: "Set immutable flag on /etc/resolv.conf"
+      ansible.builtin.command: chattr +i /etc/resolv.conf
+      changed_when: true
+
+  tags: wsl-win-integration
+
+- name: "Set custom MTU"
+  become: true
+  ansible.builtin.command: "ip link set dev eth0 mtu {{ wsl_config_networkfix_mtu }}"
+  when: wsl_config_networkfix_mtu | default('') | length > 0
+  changed_when: true
+  tags: wsl-win-integration
+
+- name: "Deploy Windows .wslconfig"
+  become: true
+  block:
+
+    - name: "Discover Windows username from home mount"
+      ansible.builtin.set_fact:
+        _win_username: "{{ wsl_config_users[0].win_username | default(wsl_config_users[0].username) }}"
+      when: wsl_config_users | length > 0
+
+    - name: "Deploy .wslconfig to Windows user home"
+      ansible.builtin.template:
+        src: "{{ wsl_version }}/wslconfig.j2"
+        dest: "{{ wsl_config_win_home_root }}/{{ _win_username }}/.wslconfig"
+        mode: "0644"
+      when: _win_username is defined
+
+  when: wsl_config_winconfig_manage | default(false)
+  tags: wsl-win-integration

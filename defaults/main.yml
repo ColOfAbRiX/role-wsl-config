@@ -25,9 +25,9 @@ default_wsl_config_wsl_conf:
   # Network Settings - Control DNS and hosts file generation
   network:
     # Automatically generate /etc/hosts (true/false)
-    # generateHosts: "true"
+    generateHosts: "false" # Required "false" for the Network Fix
     # Automatically generate /etc/resolv.conf (true/false)
-    # generateResolvConf: "true"
+    generateResolvConf: "false" # Required "false" for the Network Fix
     # Sets hostname to be used for WSL distribution (string)
     hostname: "{{ wsl_config_wsl_hostname | default('') }}"
 
@@ -75,3 +75,18 @@ wsl_config_wsl_resolveConf: []
 wsl_config_host_address_path: "/usr/local/bin"
 wsl_config_host_address_file: "/run/host-address.fifo"
 wsl_config_host_address_pid: "/var/run/host-address.pid"
+
+# Network fix. See: https://github.com/microsoft/WSL/issues/5420#issuecomment-646479747
+wsl_config_networkfix_enabled: true
+wsl_config_networkfix_mtu: ""
+wsl_config_networkfix_resolv_conf:
+  network:
+    generateHosts: "false"
+    generateResolvConf: "false"
+wsl_config_winconfig_manage: false
+wsl_config_winconfig:
+  wsl2:
+    networkingMode: "mirrored"
+    dnsTunneling: "true"
+    autoProxy: "true"
+    firewall: "true"

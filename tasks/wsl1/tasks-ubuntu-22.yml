@@ -67,5 +67,4 @@
       - wsl.conf
       - hosts
 
-  when: wsl_config_integrate_services | default(true) | bool
   tags: wsl-win-integration

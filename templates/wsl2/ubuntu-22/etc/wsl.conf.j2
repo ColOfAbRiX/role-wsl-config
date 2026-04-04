@@ -1,6 +1,9 @@
 # /etc/wsl.conf
 
-{% set wsl_conf = wsl_config_wsl_conf | default({}) | combine(default_wsl_config_wsl_conf, recursive=True) %}
+{% set distro_default_config = distro_default_wsl_config_wsl_conf | default({}) %}
+{% set default_config = default_wsl_config_wsl_conf | default({}) %}
+{% set user_config = wsl_config_wsl_conf | default({}) %}
+{% set wsl_conf = distro_default_config | combine(default_config, recursive=True) | combine(user_config, recursive=True) %}
 {% for section, options in wsl_conf.items() %}
 {% if options | length > 0 %}
 [{{ section }}]

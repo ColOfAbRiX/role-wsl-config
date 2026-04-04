@@ -6,6 +6,16 @@
     state: present
   tags: wsl-win-integration
 
+- name: "Set user cache directory"
+  ansible.builtin.file:
+    dest: "/var/cache/{{ item.username }}"
+    state: directory
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+    mode: "0755"
+  loop: "{{ wsl_config_users }}"
+  tags: wsl-win-integration
+
 - name: "Fix WSL2 Windows Binary Interop"
   ansible.builtin.include_tasks: bin-interop.yml
   tags: wsl-win-integration
@@ -16,13 +26,14 @@
 
 - name: "Fix WSL2 Windows Networking"
   ansible.builtin.include_tasks: network-fixes.yml
-  when: wsl_config_networkfix_enabled | default(true)
+  when: wsl_version == "wsl2"
   tags: wsl-win-integration
 
 - name: "Host IP Address Advertiser"
   ansible.builtin.include_tasks: host-ip-advertiser.yml
   tags: wsl-win-integration
-- name: "Set system configuration"
+
+- name: "Set system configuration files"
   ansible.builtin.template:
     src: "{{ templates_root }}/etc/{{ item }}.j2"
     dest: "/etc/{{ item }}"
@@ -32,7 +43,7 @@
   with_items:
     - resolv.conf
     - hosts
-  when: not (wsl_config_networkfix_enabled | default(true))
+  when: wsl_version == "wsl1"
   tags: wsl-win-integration
 
 - name: "Disable Unwanted Services"
@@ -43,4 +54,14 @@
     state: stopped
     masked: false
   loop: "{{ wsl_config_nostart_services }}"
+  tags: wsl-win-integration
+
+- name: "Git selector script"
+  become: true
+  ansible.builtin.template:
+    src: "{{ templates_root }}/etc/profile.d/git-performance.sh.j2"
+    dest: /etc/profile.d/git-performance.sh
+    owner: root
+    group: root
+    mode: "0755"
   tags: wsl-win-integration

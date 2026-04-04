@@ -3,10 +3,10 @@
 
 wsl_config_wsl_hostname: ""
 wsl_config_win_home_root: "/mnt/c/Users"
-wsl_config_integrate_services: true
 
 wsl_config_users: []
-#  - username: linuxusername
+#  - username: linux_username
+#    win_username: windows_username
 
 # /etc/wsl.conf - See https://learn.microsoft.com/en-us/windows/wsl/wsl-config#set-wsl-launch-settings
 wsl_config_wsl_conf: {}
@@ -21,46 +21,101 @@ default_wsl_config_wsl_conf:
     # root: "/mnt/"
     # Comma-separated list of DrvFs-specific options (uid, gid, umask, fmask, dmask, metadata, case)
     options: "metadata,umask=22,fmask=11"
-
   # Network Settings - Control DNS and hosts file generation
   network:
     # Automatically generate /etc/hosts (true/false)
-    generateHosts: "false" # Required "false" for the Network Fix
+    generateHosts: "false"
     # Automatically generate /etc/resolv.conf (true/false)
-    generateResolvConf: "false" # Required "false" for the Network Fix
+    generateResolvConf: "false"
     # Sets hostname to be used for WSL distribution (string)
     hostname: "{{ wsl_config_wsl_hostname | default('') }}"
-
-  # Interoperability Settings - Control Windows/Linux interoperability
-  interop:
-    # Enable interoperability with Windows (true/false)
-    enabled: "true"
-    # Add Windows PATH to Linux PATH (true/false)
-    appendWindowsPath: "true"
-
+  # # Interoperability Settings - Control Windows/Linux interoperability
+  # interop:
+  #   # Enable interoperability with Windows (true/false)
+  #   enabled: "true"
+  #   # Add Windows PATH to Linux PATH (true/false)
+  #   appendWindowsPath: "true"
   # User Settings - Default user for WSL
   # user:
   #   # Default user to launch WSL with (string)
   #   default: ""
-
   # Boot Settings - Commands and services to run at boot
   boot:
-    # Command to run when WSL instance boots (string)
+    # # Command to run when WSL instance boots (string)
     # command: ""
-    # Enable systemd support (true/false) - Note: requires WSL 0.67.6+
-    systemd: "{{ default_wsl_config_wsl_conf_boot_systemd }}"
+    # # Enable systemd support (true/false) - Note: requires WSL 0.67.6+
+    systemd: "true"
     # Prevent WSL from generating systemd units when systemd is enabled (bool, Win11+)
-    protectBinfmt: "false"
-
+    # protectBinfmt: "true"
   # GPU Settings - GPU access (WSL2 only)
   # gpu:
   #   # Enable GPU access from WSL (true/false)
   #   enabled: "true"
-
   # Time Settings - Time synchronization
   # time:
   #   # Use and sync to Windows timezone (true/false)
   #   useWindowsTimezone: "true"
+
+# Windows .wslconfig
+wsl_config_winconfig: {}
+default_wsl_config_winconfig: {}
+  # wsl2:
+  #   # An absolute Windows path to a custom Linux kernel.
+  #   kernel: <path>
+  #   # An absolute Windows path to a custom Linux kernel modules VHD.
+  #   kernelModules: <path>
+  #   # How much memory to assign to the WSL 2 VM.
+  #   memory: <size>
+  #   # How many logical processors to assign to the WSL 2 VM.
+  #   processors: <number>
+  #   # Boolean specifying if ports bound to wildcard or localhost in the WSL 2 VM should be connectable from the host via localhost:port.
+  #   localhostForwarding: true
+  #   # Additional kernel command line arguments.
+  #   kernelCommandLine: <string>
+  #   # Run WSL in "Safe Mode" which disables many features and is intended to be used to recover distributions that are in bad states. Only available for Windows 11 and WSL version 0.66.2+.
+  #   safeMode: false
+  #   # How much swap space to add to the WSL 2 VM, 0 for no swap file. Swap storage is disk-based RAM used when memory demand exceeds limit on hardware device.
+  #   swap: <size>
+  #   # An absolute Windows path to the swap virtual hard disk.
+  #   swapFile: "%Temp%\swap.vhdx"
+  #   # Boolean to turn on or off support for GUI applications (WSLg) in WSL.
+  #   guiApplications: true
+  #   # Boolean to turn on an output console Window that shows the contents of dmesg upon start of a WSL 2 distro instance.
+  #   debugConsole: false
+  #   # Set the maximum number of crash dump files that will be retained for debugging purposes. The default number retained by WSL is 10. When this limit is exceeded, older crash dumps will be automatically deleted to make room for new ones. Setting a max can help with reducing the amount of disk space used by these crash files.
+  #   # Boolean to turn on or off nested virtualization, enabling other nested VMs to run inside WSL 2.
+  #   maxCrashDumpCount: 10
+  #   # Boolean to turn on or off nested virtualization, enabling other nested VMs to run inside WSL 2.
+  #   nestedVirtualization: true
+  #   # The number of milliseconds that a VM is idle, before it is shut down.
+  #   vmIdleTimeout: 60000
+  #   # Only applicable to networkingMode = NAT. Boolean to inform WSL to configure the DNS Server in Linux to the NAT on the host. Setting to false will mirror DNS servers from Windows to Linux.
+  #   dnsProxy: true
+  #   # Available values are: none, nat, bridged (deprecated), mirrored, and virtioproxy. If the value is none, the WSL network is disconnected. If the value is nat or an unknown value, NAT network mode is used (starting from WSL 2.3.25, if NAT network mode fails, it falls back to using VirtioProxy network mode). If the value is bridged, the bridged network mode is used (this mode has been marked as deprecated since WSL 2.4.5). If the value is mirrored, the mirrored network mode is used. If the value is virtioproxy, the VirtioProxy network mode is used.
+  #   networkingMode: nat
+  #   # Setting this to true allows the Windows Firewall rules, as well as rules specific to Hyper-V traffic, to filter WSL network traffic.
+  #   firewall: true
+  #   # Changes how DNS requests are proxied from WSL to Windows
+  #   dnsTunneling: true
+  #   # Enforces WSL to use Windows’ HTTP proxy information
+  #   autoProxy: true
+  #   # Set the Virtual Hard Disk (VHD) size that stores the Linux distribution (for example, Ubuntu) file system. Can be used to limit the maximum size that a distribution file system is allowed to take up.
+  #   defaultVhdSize: 1099511627776
+  # experimental:
+  #   # Available values are: disabled, gradual, and dropCache. If the value is disabled, WSL automatic memory reclamation will be disabled. If the value is gradual, cached memory will be reclaimed slowly and automatically. If the value is dropCache or an unknown value, cached memory will be reclaimed immediately.
+  #   autoMemoryReclaim: <gradual|dropcache|disabled>
+  #   # When set to true, any newly created VHD will be set to sparse automatically.
+  #   sparseVhd: false
+  #   # Only applicable when wsl2.dnsTunneling is set to true. When set to true, Windows will extract the question from the DNS request and attempt to resolve it, ignoring the unknown records.
+  #   bestEffortDnsParsing:
+  #   # Only applicable when wsl2.dnsTunneling is set to true. Specifies the nameserver that will be configured in the Linux resolv.conf file when DNS tunneling is enabled.
+  #   dnsTunnelingIpAddress: 10.255.255.254
+  #   # Only applicable when wsl2.autoProxy is set to true. Configures how long (in milliseconds) WSL will wait for retrieving HTTP proxy information when starting a WSL container. If proxy settings are resolved after this time, the WSL instance must be restarted to use the retrieved proxy settings.
+  #   initialAutoProxyTimeout: 1000
+  #   # Only applicable when wsl2.networkingMode is set to mirrored. Specifies which ports Linux applications can bind to, even if that port is used in Windows. This enables applications to listen on a port for traffic purely within Linux, so those applications are not blocked even when that port is used for other purposes on Windows. For example, WSL will allow binding to port 53 in Linux for Docker Desktop, as it is listening only to requests from within the Linux container. Should be formatted in a comma separated list, e.g: 3000,9000,9090
+  #   ignoredPorts:
+  #   # Only applicable when wsl2.networkingMode is set to mirrored. When set to true, will allow the Container to connect to the Host, or the Host to connect to the Container, by an IP address that's assigned to the Host. The 127.0.0.1 loopback address can always be used,this option allows for all additionally assigned local IP addresses to be used as well. Only IPv4 addresses assigned to the host are supported.
+  #   hostAddressLoopback: false
 
 # /etc/hosts
 wsl_config_hosts: []
@@ -77,16 +132,8 @@ wsl_config_host_address_file: "/run/host-address.fifo"
 wsl_config_host_address_pid: "/var/run/host-address.pid"
 
 # Network fix. See: https://github.com/microsoft/WSL/issues/5420#issuecomment-646479747
-wsl_config_networkfix_enabled: true
 wsl_config_networkfix_mtu: ""
 wsl_config_networkfix_resolv_conf:
   network:
     generateHosts: "false"
     generateResolvConf: "false"
-wsl_config_winconfig_manage: false
-wsl_config_winconfig:
-  wsl2:
-    networkingMode: "mirrored"
-    dnsTunneling: "true"
-    autoProxy: "true"
-    firewall: "true"

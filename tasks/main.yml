@@ -1,4 +1,5 @@
 ---
+
 - name: "Require Correct Linux Distribution"
   ansible.builtin.assert:
     that:
@@ -11,8 +12,12 @@
 - name: "Detect WSL version"
   ansible.builtin.set_fact:
     wsl_version: "{{ 'wsl2' if ansible_kernel is search('WSL2') else 'wsl1' }}"
-    templates_root: "{{ 'wsl2' if ansible_kernel is search('WSL2') else 'wsl1' }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
-    files_root: "{{ 'wsl2' if ansible_kernel is search('WSL2') else 'wsl1' }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
+  tags: always
+
+- name: "Set derived variables"
+  ansible.builtin.set_fact:
+    templates_root: "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
+    files_root:     "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
   tags: always
 
 - name: "Include OS/WSL Variables"
@@ -21,15 +26,6 @@
 
 - name: "Run OS/WSL Tasks"
   ansible.builtin.include_tasks: "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}/main.yml"
-  tags: wsl-win-integration
-
-- name: "Set wsl.conf"
-  ansible.builtin.template:
-    src: "{{ templates_root }}/etc/wsl.conf.j2"
-    dest: "/etc/wsl.conf"
-    owner: root
-    group: root
-    mode: "0644"
   tags: wsl-win-integration
 
 - name: "Set Hostname"
@@ -57,12 +53,21 @@
   loop: "{{ wsl_config_users }}"
   tags: wsl-win-integration
 
-- name: "Set user cache directory"
-  ansible.builtin.file:
-    dest: "/var/cache/{{ item.username }}"
-    state: directory
-    owner: "{{ item.username }}"
-    group: "{{ item.username }}"
-    mode: "0755"
+- name: "Set wsl.conf"
+  ansible.builtin.template:
+    src: "{{ templates_root }}/etc/wsl.conf.j2"
+    dest: "/etc/wsl.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  tags: wsl-win-integration
+
+- name: "Set .wslconfig"
+  ansible.builtin.template:
+    src: "{{ wsl_version }}/wslconfig.j2"
+    dest: "{{ wsl_config_win_home_root }}/{{ item.win_username }}/.wslconfig"
+    owner: root
+    group: root
+    mode: "0644"
   loop: "{{ wsl_config_users }}"
   tags: wsl-win-integration

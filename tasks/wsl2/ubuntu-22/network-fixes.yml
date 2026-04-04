@@ -30,6 +30,7 @@
     - name: "Enforce resolve.conf configuration"
       ansible.builtin.set_fact:
         default_wsl_config_wsl_conf: "{{ default_wsl_config_wsl_conf | combine(wsl_config_networkfix_resolv_conf) }}"
+        wsl_config_wsl_conf: "{{ wsl_config_wsl_conf | combine(wsl_config_networkfix_resolv_conf) }}"
 
     - name: "Remove immutable flag from /etc/resolv.conf"
       ansible.builtin.command: chattr -i /etc/resolv.conf
@@ -84,5 +85,4 @@
         mode: "0644"
       when: _win_username is defined
 
-  when: wsl_config_winconfig_manage | default(false)
   tags: wsl-win-integration

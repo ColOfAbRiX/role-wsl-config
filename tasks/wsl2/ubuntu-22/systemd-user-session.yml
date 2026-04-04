@@ -6,7 +6,6 @@
     database: passwd
   tags: wsl-win-integration
 
-# TODO: I'm not sure item.username is correct
 - name: "Enable User Lingering to prevent runtime-dir timeout"
   become: true
   ansible.builtin.command:
@@ -22,10 +21,9 @@
     dest: /etc/profile.d/wsl-xdg-runtime.sh
     owner: root
     group: root
-    mode: "0644"
+    mode: "0755"
   tags: wsl-win-integration
 
-# TODO: I'm not sure item.username is correct
 - name: "Ensure user runtime services are enabled"
   become: true
   ansible.builtin.systemd:

@@ -37,4 +37,20 @@ wsl_config_nostart_services:
  - plymouth
  - unattended-upgrades
 
-default_wsl_config_wsl_conf_boot_systemd: "true"
+distro_default_wsl_config_wsl_conf:
+  boot:
+    protectBinfmt: "false"
+  interop:
+    enabled: "true"
+    appendWindowsPath: "true"
+
+distro_default_wsl_config_winconfig:
+  wsl2:
+    networkingMode: "mirrored"
+    dnsTunneling: "true"
+    autoProxy: "true"
+    firewall: "true"
+    autoMemoryReclaim: dropCache
+  experimental:
+    sparseVhd: "false"
+    vmIdleTimeout: 300000

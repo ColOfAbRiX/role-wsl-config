@@ -1,7 +1,11 @@
 # .wslconfig
 # See: https://learn.microsoft.com/en-us/windows/wsl/wsl-config
 
-{% for section, options in wsl_config_winconfig.items() %}
+{% set distro_default_config = distro_default_wsl_config_winconfig | default({}) %}
+{% set default_config = default_wsl_config_winconfig | default({}) %}
+{% set user_config = wsl_config_winconfig | default({}) %}
+{% set winconfig = distro_default_config | combine(default_config, recursive=True) | combine(user_config, recursive=True) %}
+{% for section, options in winconfig.items() %}
 [{{ section }}]
 {% for key, value in options.items() %}
 {{ key }}={{ value }}

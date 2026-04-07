@@ -1,8 +1,17 @@
+---
 galaxy_info:
-  author: Fabrizio Colonna
-  description: WSL Configuration and integration with Windows
+  author: Fabrizio Colonna <colofabrix@tin.it>
+  description: WSL environment configuration and Windows integration
   license: MIT
-  min_ansible_version: 2.4
-  galaxy_tags: []
+  min_ansible_version: "2.10"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - wsl
+    - windows
+    - integration
+    - configuration
 
 dependencies: []

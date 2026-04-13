@@ -1,12 +1,11 @@
 ---
-
 - name: "Copy host-address.py to the target machine"
   ansible.builtin.copy:
     src: "{{ files_root }}/host-address.py"
     dest: "{{ wsl_config_host_address_path }}/host-address.py"
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
   tags: wsl-win-integration
 
 - name: "Create the systemd service file from template"
@@ -15,7 +14,7 @@
     dest: /etc/systemd/system/host-address.service
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   register: host_address_unit
   tags: wsl-win-integration
 

@@ -1,5 +1,4 @@
 ---
-
 - name: "Mask the WSL-provided systemd skip-condition"
   become: true
   ansible.builtin.file:

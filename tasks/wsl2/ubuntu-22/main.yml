@@ -1,5 +1,4 @@
 ---
-
 - name: "Install OS Dependencies"
   ansible.builtin.apt:
     name: "{{ wsl_config_os_dependencies }}"
@@ -12,7 +11,7 @@
     state: directory
     owner: "{{ item.username }}"
     group: "{{ item.username }}"
-    mode: "0755"
+    mode: "0744"
   loop: "{{ wsl_config_users }}"
   tags: wsl-win-integration
 
@@ -31,19 +30,6 @@
 
 - name: "Host IP Address Advertiser"
   ansible.builtin.include_tasks: host-ip-advertiser.yml
-  tags: wsl-win-integration
-
-- name: "Set system configuration files"
-  ansible.builtin.template:
-    src: "{{ templates_root }}/etc/{{ item }}.j2"
-    dest: "/etc/{{ item }}"
-    owner: root
-    group: root
-    mode: "0644"
-  with_items:
-    - resolv.conf
-    - hosts
-  when: wsl_version == "wsl1"
   tags: wsl-win-integration
 
 - name: "Disable Unwanted Services"

@@ -1,5 +1,4 @@
 ---
-
 - name: "Require Correct Linux Distribution"
   ansible.builtin.assert:
     that:
@@ -9,23 +8,33 @@
     quiet: true
   tags: wsl-win-integration
 
-- name: "Detect WSL version"
-  ansible.builtin.set_fact:
-    wsl_version: "{{ 'wsl2' if ansible_kernel is search('WSL2') else 'wsl1' }}"
-  tags: always
+- name: "Set Variables"
+  block:
+    - ansible.builtin.set_fact:
+        wsl_version: "{{ 'wsl2' if ansible_kernel is search('WSL2') else 'wsl1' }}"
 
-- name: "Set derived variables"
-  ansible.builtin.set_fact:
-    templates_root: "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
-    files_root:     "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
-  tags: always
+    - ansible.builtin.set_fact:
+        templates_root: "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
+        files_root: "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
 
-- name: "Include OS/WSL Variables"
-  ansible.builtin.include_vars: "{{ wsl_version }}/vars-{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
-  tags: always
+  tags: wsl-win-integration
 
-- name: "Run OS/WSL Tasks"
-  ansible.builtin.include_tasks: "{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}/main.yml"
+- name: "Load Variables"
+  ansible.builtin.include_vars: "{{ lookup('first_found', files) }}"
+  vars:
+    files:
+      - "vars/{{ wsl_version }}/vars-{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}.yml"
+      - "vars/{{ wsl_version }}/vars-{{ ansible_distribution | lower }}.yml"
+      - "vars/{{ wsl_version }}/vars-{{ ansible_os_family | lower }}.yml"
+  tags: wsl-win-integration
+
+- name: "Run Environment Tasks"
+  ansible.builtin.include_tasks: "{{ lookup('first_found', files) }}"
+  vars:
+    files:
+      - "tasks/{{ wsl_version }}/{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}/main.yml"
+      - "tasks/{{ wsl_version }}/{{ ansible_distribution | lower }}/main.yml"
+      - "tasks/{{ wsl_version }}/{{ ansible_os_family | lower }}/main.yml"
   tags: wsl-win-integration
 
 - name: "Set Hostname"

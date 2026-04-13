@@ -1,5 +1,4 @@
 ---
-
 - name: "Get UID for WSL users"
   become: true
   ansible.builtin.getent:

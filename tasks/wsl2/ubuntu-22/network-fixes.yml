@@ -1,11 +1,9 @@
 ---
-
 # Network fix. See: https://github.com/microsoft/WSL/issues/5420#issuecomment-646479747
 
 - name: "Disable systemd-resolved"
   become: true
   block:
-
     - name: "Check if systemd-resolved is present"
       ansible.builtin.command: systemctl list-unit-files systemd-resolved.service
       register: resolved_check
@@ -19,14 +17,13 @@
         enabled: false
         masked: true
       when: resolved_check.rc == 0 and
-            'systemd-resolved.service' in resolved_check.stdout
+        'systemd-resolved.service' in resolved_check.stdout
 
   tags: wsl-win-integration
 
 - name: "Configure /etc/resolv.conf"
   become: true
   block:
-
     - name: "Enforce resolve.conf configuration"
       ansible.builtin.set_fact:
         default_wsl_config_wsl_conf: "{{ default_wsl_config_wsl_conf | combine(wsl_config_networkfix_resolv_conf) }}"
@@ -72,7 +69,6 @@
 - name: "Deploy Windows .wslconfig"
   become: true
   block:
-
     - name: "Discover Windows username from home mount"
       ansible.builtin.set_fact:
         _win_username: "{{ wsl_config_users[0].win_username | default(wsl_config_users[0].username) }}"

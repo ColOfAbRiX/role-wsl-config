@@ -16,7 +16,6 @@
         name: "{{ wsl_config_pip_dependencies }}"
         state: present
         executable: pip3
-      tags: wsl-win-integration
 
   tags: wsl-win-integration
 

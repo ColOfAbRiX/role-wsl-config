@@ -5,6 +5,13 @@
     state: present
   tags: wsl-win-integration
 
+- name: "PIP Dependencies"
+  ansible.builtin.pip:
+    name: "{{ wsl_config_pip_dependencies }}"
+    state: present
+    executable: pip3
+  tags: wsl-win-integration
+
 - name: "Set user cache directory"
   ansible.builtin.file:
     dest: "/var/cache/{{ item.username }}"

@@ -101,6 +101,8 @@ default_wsl_config_winconfig: {}
   #   autoProxy: true
   #   # Set the Virtual Hard Disk (VHD) size that stores the Linux distribution (for example, Ubuntu) file system. Can be used to limit the maximum size that a distribution file system is allowed to take up.
   #   defaultVhdSize: 1099511627776
+  #   # Experimental feature for faster disk access
+  #   virtiofs: true
   # experimental:
   #   # Available values are: disabled, gradual, and dropCache. If the value is disabled, WSL automatic memory reclamation will be disabled. If the value is gradual, cached memory will be reclaimed slowly and automatically. If the value is dropCache or an unknown value, cached memory will be reclaimed immediately.
   #   autoMemoryReclaim: <gradual|dropcache|disabled>

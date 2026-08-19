@@ -22,6 +22,13 @@
     mode: "0644"
   tags: wsl-win-integration
 
+- name: "Disable mono CLI binfmt handler to prevent race with WSLInterop"
+  become: true
+  ansible.builtin.shell: |
+    update-binfmts --disable cli || true
+  changed_when: false
+  tags: wsl-win-integration
+
 - name: "Force-apply the correct Interop registration"
   become: true
   ansible.builtin.shell: |

@@ -22,11 +22,28 @@
     mode: "0644"
   tags: wsl-win-integration
 
-- name: "Disable mono CLI binfmt handler to prevent race with WSLInterop"
+- name: "Ensure binfmt-support strips mono cli handler after each start"
   become: true
-  ansible.builtin.shell: |
-    update-binfmts --disable cli || true
-  changed_when: false
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/binfmt-support.service.d/order-interop.conf
+    content: |
+      [Service]
+      ExecStartPost=/usr/sbin/update-binfmts --disable cli
+    owner: root
+    group: root
+    mode: "0644"
+  tags: wsl-win-integration
+
+- name: "Order systemd-binfmt after binfmt-support"
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/systemd-binfmt.service.d/order-binfmt-support.conf
+    content: |
+      [Unit]
+      After=binfmt-support.service
+    owner: root
+    group: root
+    mode: "0644"
   tags: wsl-win-integration
 
 - name: "Force-apply the correct Interop registration"
